@@ -7,17 +7,19 @@ const FREQUENCY_OPTIONS = ["Daily", "Weekly", "Monthly", "As Needed"];
 
 interface Step {
   step_name: string;
-  inputs: string;
-  outputs: string;
-  time_spent: string;
+  description: string;
+  applications_used: string;
+  owner: string;
+  estimated_time: string;
   handed_to: string;
 }
 
 const EMPTY_STEP: Step = {
   step_name: "",
-  inputs: "",
-  outputs: "",
-  time_spent: "",
+  description: "",
+  applications_used: "",
+  owner: "",
+  estimated_time: "",
   handed_to: "",
 };
 
@@ -26,6 +28,8 @@ export default function Home() {
   const [submittedBy, setSubmittedBy] = useState("");
   const [role, setRole] = useState("");
   const [frequency, setFrequency] = useState("");
+  const [responsibleParties, setResponsibleParties] = useState("");
+  const [criticalAssumptions, setCriticalAssumptions] = useState("");
   const [steps, setSteps] = useState<Step[]>([{ ...EMPTY_STEP }]);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -52,7 +56,14 @@ export default function Home() {
     // Insert the workflow
     const { data: workflow, error: wfError } = await supabase
       .from("workflows")
-      .insert([{ workflow_name: workflowName, submitted_by: submittedBy, role, frequency }])
+      .insert([{
+        workflow_name: workflowName,
+        submitted_by: submittedBy,
+        role,
+        frequency,
+        responsible_parties: responsibleParties,
+        critical_assumptions: criticalAssumptions,
+      }])
       .select("id")
       .single();
 
@@ -84,6 +95,8 @@ export default function Home() {
     setSubmittedBy("");
     setRole("");
     setFrequency("");
+    setResponsibleParties("");
+    setCriticalAssumptions("");
     setSteps([{ ...EMPTY_STEP }]);
     setTimeout(() => setStatus("idle"), 3000);
   }
@@ -161,6 +174,34 @@ export default function Home() {
                 ))}
               </select>
             </div>
+
+            <div>
+              <label htmlFor="responsible_parties" className="block text-sm font-medium text-gray-700 mb-1">
+                Responsible Parties
+              </label>
+              <textarea
+                id="responsible_parties"
+                rows={2}
+                value={responsibleParties}
+                onChange={(e) => setResponsibleParties(e.target.value)}
+                placeholder="Everyone involved in this workflow (e.g. PM, Assistant PM, Accounting, GC)"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="critical_assumptions" className="block text-sm font-medium text-gray-700 mb-1">
+                Critical Assumptions
+              </label>
+              <textarea
+                id="critical_assumptions"
+                rows={3}
+                value={criticalAssumptions}
+                onChange={(e) => setCriticalAssumptions(e.target.value)}
+                placeholder="What needs to be in place before this workflow can begin? (e.g. signed contract, approved budget, invoice received)"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           {/* Steps */}
@@ -201,42 +242,53 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Inputs
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={step.inputs}
-                      onChange={(e) => updateStep(index, "inputs", e.target.value)}
-                      placeholder="What do you need for this step?"
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Outputs
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={step.outputs}
-                      onChange={(e) => updateStep(index, "outputs", e.target.value)}
-                      placeholder="What does this step produce?"
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={step.description}
+                    onChange={(e) => updateStep(index, "description", e.target.value)}
+                    placeholder="What happens in this step? What goes in and what comes out?"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Applications Used
+                  </label>
+                  <input
+                    type="text"
+                    value={step.applications_used}
+                    onChange={(e) => updateStep(index, "applications_used", e.target.value)}
+                    placeholder="e.g. Yardi, Outlook, Box, Procore"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Time Spent
+                      Owner
                     </label>
                     <input
                       type="text"
-                      value={step.time_spent}
-                      onChange={(e) => updateStep(index, "time_spent", e.target.value)}
+                      value={step.owner}
+                      onChange={(e) => updateStep(index, "owner", e.target.value)}
+                      placeholder="Who does this step?"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Estimated Time
+                    </label>
+                    <input
+                      type="text"
+                      value={step.estimated_time}
+                      onChange={(e) => updateStep(index, "estimated_time", e.target.value)}
                       placeholder="e.g. 15 min"
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />

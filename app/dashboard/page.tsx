@@ -7,9 +7,10 @@ interface WorkflowStep {
   id: string;
   step_number: number;
   step_name: string;
-  inputs: string;
-  outputs: string;
-  time_spent: string;
+  description: string;
+  applications_used: string;
+  owner: string;
+  estimated_time: string;
   handed_to: string;
 }
 
@@ -17,7 +18,10 @@ interface Workflow {
   id: string;
   workflow_name: string;
   submitted_by: string;
+  role: string;
   frequency: string;
+  responsible_parties: string;
+  critical_assumptions: string;
   created_at: string;
   workflow_steps: WorkflowStep[];
 }
@@ -109,7 +113,22 @@ export default function Dashboard() {
 
                   {/* Expanded steps */}
                   {isOpen && (
-                    <div className="border-t border-gray-200 px-5 py-4">
+                    <div className="border-t border-gray-200 px-5 py-4 space-y-4">
+                      {/* Workflow-level context */}
+                      {(wf.responsible_parties || wf.critical_assumptions || wf.role) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 pb-3 border-b border-gray-100">
+                          {wf.role && (
+                            <p><span className="font-medium text-gray-700">Role:</span> {wf.role}</p>
+                          )}
+                          {wf.responsible_parties && (
+                            <p><span className="font-medium text-gray-700">Responsible parties:</span> {wf.responsible_parties}</p>
+                          )}
+                          {wf.critical_assumptions && (
+                            <p className="sm:col-span-2"><span className="font-medium text-gray-700">Critical assumptions:</span> {wf.critical_assumptions}</p>
+                          )}
+                        </div>
+                      )}
+
                       <div className="space-y-3">
                         {wf.workflow_steps.map((step, i) => (
                           <div key={step.id} className="flex gap-3">
@@ -128,15 +147,18 @@ export default function Dashboard() {
                               <p className="text-sm font-medium text-gray-900">
                                 {step.step_name}
                               </p>
+                              {step.description && (
+                                <p className="mt-1 text-xs text-gray-600">{step.description}</p>
+                              )}
                               <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
-                                {step.inputs && (
-                                  <p><span className="font-medium text-gray-600">Inputs:</span> {step.inputs}</p>
+                                {step.applications_used && (
+                                  <p><span className="font-medium text-gray-600">Applications:</span> {step.applications_used}</p>
                                 )}
-                                {step.outputs && (
-                                  <p><span className="font-medium text-gray-600">Outputs:</span> {step.outputs}</p>
+                                {step.owner && (
+                                  <p><span className="font-medium text-gray-600">Owner:</span> {step.owner}</p>
                                 )}
-                                {step.time_spent && (
-                                  <p><span className="font-medium text-gray-600">Time:</span> {step.time_spent}</p>
+                                {step.estimated_time && (
+                                  <p><span className="font-medium text-gray-600">Est. time:</span> {step.estimated_time}</p>
                                 )}
                                 {step.handed_to && (
                                   <p><span className="font-medium text-gray-600">Handed to:</span> {step.handed_to}</p>

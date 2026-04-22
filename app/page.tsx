@@ -318,21 +318,31 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {status === "loading" ? "Submitting..." : "Submit Workflow"}
-          </button>
+          {/* Submit section — visually separated to prevent accidental early submission */}
+          <div className="pt-8 mt-8 border-t border-gray-300">
+            <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+              <p className="text-sm font-medium text-gray-900 mb-1">
+                Ready to submit?
+              </p>
+              <p className="text-xs text-gray-500 mb-4">
+                Make sure you&apos;ve added every step in this workflow using the &ldquo;+ Add Step&rdquo; button above. Once submitted, you&apos;ll need to re-enter the whole workflow to make changes.
+              </p>
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {status === "loading" ? "Submitting..." : `Submit Workflow (${steps.length} step${steps.length !== 1 ? "s" : ""})`}
+              </button>
 
-          {status === "success" && (
-            <p className="text-sm text-green-600 text-center">Workflow submitted successfully!</p>
-          )}
-          {status === "error" && (
-            <p className="text-sm text-red-600 text-center">Error: {errorMsg}</p>
-          )}
+              {status === "success" && (
+                <p className="mt-3 text-sm text-green-600 text-center">Workflow submitted successfully!</p>
+              )}
+              {status === "error" && (
+                <p className="mt-3 text-sm text-red-600 text-center">Error: {errorMsg}</p>
+              )}
+            </div>
+          </div>
         </form>
       </div>
     </main>
